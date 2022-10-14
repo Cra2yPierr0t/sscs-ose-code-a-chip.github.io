@@ -29,46 +29,45 @@ module Vthernet (
     wire [31:0] wbs_adr_i;
     wire        wbs_ack_o;
     wire [31:0] wbs_dat_o;
-
-    wire        rx_data_v;
-    wire [7:0]  rx_data;
-    wire [7:0]  rx_mem_out;
-    wire [31:0] rx_addr;
     
-    // PicoRV interface
-    wire        rx_irq;
-
-    RX_Vthernet_MAC RX_Vthernet_MAC(
-        .rst        (wb_rst_i   ),
-        // Wishbone interface
-        .wb_clk_i   (wb_clk_i   ),
-        .wb_rst_i   (wb_rst_i   ),
-        .wbs_stb_i  (wbs_stb_i  ),
-        .wbs_cyc_i  (wbs_cyc_i  ),
-        .wbs_we_i   (wbs_we_i   ),
-        .wbs_sel_i  (wbs_sel_i  ),
-        .wbs_dat_i  (wbs_dat_i  ),
-        .wbs_adr_i  (wbs_adr_i  ),
-        .wbs_ack_o  (wbs_ack_o  ),
-        .wbs_dat_o  (wbs_dat_o  ),
+    Vthernet_RX_MAC Vthernet_RX_MAC(
+        .rst(rst),
+        .clk(clk),
+        
+        // CSRs
+        .my_mac_addr(),
+        .ethernet_len_type(),
+        .dst_mac_addr(),
+        .src_mac_addr(),
+        
+        // CPU interface
+        .rx_irq(),
+        
         // GMII interface
-        .GTX_CLK    (GTX_CLK    ),
-        .TX_EN      (TX_EN      ),
-        .TXD        (TXD        ),
-        .TX_ER      (TX_ER      ),
-        .RX_CLK     (RX_CLK     ),
-        .RX_DV      (RX_DV      ),
-        .RXD        (RXD        ),
-        .RX_ER      (RX_ER      ),
-        .MDC        (MDC        ),
-        .MDIO       (MDIO       ),
-        // PicoRV interface
-        .rx_irq     (rx_irq     ),
-        // Memory Interface
-        .rx_data_v  (rx_data_v  ),
-        .rx_data    (rx_data    ),
-        .rx_mem_out (rx_mem_out ),
-        .rx_addr    (rx_addr    )
+        .RX_CLK(RX_CLK),
+        .RX_DV(RX_DV),
+        .RXD(RXD),
+        .RX_ER(RX_ER),
+        
+        // Memory interface
+        .rx_mem_wen(),
+        .rx_mem_data(),
+        .rx_mem_addr()
+    );
+    
+    Vthernet_TX_MAC Vthernet_TX_MAC(
+        // CSRs
+        // Write Only
+        .my_mac_addr(),
+        // Read Only
+        // GMII interface
+        .GTX_CLK(GTX_CLK),
+        .TX_EN(TX_EN),
+        .TXD(TXD),
+        .TX_ER(TX_ER),
+        // Memory interface
+        .tx_mem_valid(),
+        .tx_mem_data()
     );
 endmodule
 `default_nettype wire
